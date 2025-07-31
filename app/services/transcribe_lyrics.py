@@ -1,23 +1,26 @@
-import whisper
+
+from faster_whisper import WhisperModel
 from pydub import AudioSegment
 import os
 import math
-from app.config import AUDIO_DIR
+from app.config import BASE_DIR
 
-# Load Whisper model
-model = whisper.load_model("base")  # base / small / medium / large
-speech_file = "speech_only.wav"
-# Path to your audio file (mp3, wav, etc.)
-AUDIO_FILE = os.path.join(AUDIO_DIR, "Niye Jabe Ki (নিয়ে যাবে কি)｜ Daagi ｜ Afran Nisho,Xefer,Tama,Sunerah ｜ Shihab S ｜SVF Alpha-i｜ Chorki.mp3")
+# Load Faster-Whisper model (supports large-v3)
+model_size = "large-v3"  # or "base", "small", etc.
+model = WhisperModel(model_size, device="cuda" if os.environ.get("USE_CUDA") else "cpu", compute_type="int8")
+
+# Path to your audio file
+AUDIO_FILE = os.path.join("demucs_output/htdemucs/Niye Jabe Ki", "vocals.wav")
 
 # Load audio with pydub
 audio = AudioSegment.from_file(AUDIO_FILE)
 
-# Split audio into 10-second chunks (simulate real-time)
-chunk_length_ms = 10 * 1000  # 10 seconds
+# Split audio into 30-second chunks
+chunk_length_ms = 30 * 1000
 total_chunks = math.ceil(len(audio) / chunk_length_ms)
 
 print(f"Total Chunks: {total_chunks}")
+
 
 for i in range(total_chunks):
     start_ms = i * chunk_length_ms
@@ -27,7 +30,11 @@ for i in range(total_chunks):
     chunk_path = f"temp_chunk_{i}.wav"
     chunk.export(chunk_path, format="wav")
 
-    result = model.transcribe(chunk_path)
-    print(f"[{start_ms/1000:.1f}s - {end_ms/1000:.1f}s] ➤ {result['text'].strip()}")
+    # Transcribe with Faster-Whisper
+    segments, info = model.transcribe(chunk_path, beam_size=5)
+    print("Detected Language:", info.language)
+
+    transcribed_text = "".join([segment.text for segment in segments])
+    print(f"[{start_ms/1000:.1f}s - {end_ms/1000:.1f}s] ➤ {transcribed_text.strip()}")
 
     os.remove(chunk_path)

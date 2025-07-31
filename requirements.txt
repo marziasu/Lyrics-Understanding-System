@@ -1,5 +1,6 @@
 yt-dlp
-openai-whisper
+
+faster-whisper
 torch
 imageio-ffmpeg
 pydub
