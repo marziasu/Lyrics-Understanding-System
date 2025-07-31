@@ -2,7 +2,7 @@ from pydub import AudioSegment
 import numpy as np
 import torch
 import os
-
+import soundfile as sf
 from silero_vad import get_speech_timestamps, collect_chunks, read_audio
 from silero_vad.utils_vad import read_audio, collect_chunks, init_jit_model, get_speech_timestamps
 from app.services.convert_mp3_to_wav import convert_mp3_to_wav
@@ -37,23 +37,34 @@ def run_vad(audio_path, save_chunks=True, output_dir="chunks"):
         wav = wav.unsqueeze(0)
         print(f"wav shape after fix: {wav.shape}")
 
-    speech_timestamps = get_speech_timestamps(wav, model, sampling_rate=16000)
+    speech_timestamps = get_speech_timestamps(wav, model, sampling_rate=16000) # output like [{'start': 14368, 'end': 80864},{'start': 95264, 'end': 102368}]
     print(f"speech timestamps: {speech_timestamps}")
 
-    if save_chunks:
-        os.makedirs(output_dir, exist_ok=True)
-        chunks = collect_chunks(wav, speech_timestamps)
-        for i, chunk in enumerate(chunks):
-            chunk_np = (chunk.squeeze().numpy() * 32767).astype("int16")
-            audio_chunk = AudioSegment(
-                chunk_np.tobytes(),
-                frame_rate=16000,
-                sample_width=2,
-                channels=1,
-            )
-            out_path = os.path.join(output_dir, f"chunk_{i+1}.wav")
-            audio_chunk.export(out_path, format="wav")
-            print(f"Saved chunk: {out_path}")
+    if wav.dim() == 2:
+        wav = wav.squeeze(0)  # [1, N] → [N]
+        print(f"wav shape : {wav.shape}")
+    speech_only = torch.cat([wav[i['start']: i['end']] for i in speech_timestamps])
+    sf.write("speech_only.wav", speech_only.numpy(), samplerate=16000)
+
+    # if save_chunks:
+    #     os.makedirs(output_dir, exist_ok=True)
+    #     print("wav shape before stereo to mono:", wav.shape)
+    #     if wav.dim() == 2:
+    #         wav = wav.squeeze(0)  # [1, N] → [N]
+    #     print(f"wav shape : {wav.shape}")
+    #     chunks = collect_chunks(speech_timestamps, wav) # collect chunks combined all speech segments (from timestamps to waveform) # outpu: tensor([ 0.0035,  0.0056,  0.0109,  ..., -0.0504])
+    #     print(chunks)
+    #     for i, chunk in enumerate(chunks):
+    #         chunk_np = (chunk.squeeze().numpy() * 32767).astype("int16")
+    #         audio_chunk = AudioSegment(
+    #             chunk_np.tobytes(),
+    #             frame_rate=16000,
+    #             sample_width=2,
+    #             channels=1,
+    #         )
+    #         out_path = os.path.join(output_dir, f"chunk_{i+1}.wav")
+    #         audio_chunk.export(out_path, format="wav")
+    #         print(f"Saved chunk: {out_path}")
 
     return speech_timestamps
 

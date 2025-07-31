@@ -19,5 +19,6 @@ def download_audio_from_youtube(url):
     print(f"Downloaded audio saved as {output_file}")
 
 if __name__ == "__main__":
-    youtube_url = "https://www.youtube.com/watch?v=L7b6vQQkIow&list=RD-lcd1ixHqjE&index=4"
+    # youtube_url = "https://www.youtube.com/watch?v=L7b6vQQkIow&list=RD-lcd1ixHqjE&index=4"
+    youtube_url = "https://youtu.be/dIQSBvoev0Y?si=2H_17j_Oogg0aBiN"
     download_audio_from_youtube(youtube_url)

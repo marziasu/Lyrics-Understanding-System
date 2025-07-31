@@ -6,9 +6,9 @@ from app.config import AUDIO_DIR
 
 # Load Whisper model
 model = whisper.load_model("base")  # base / small / medium / large
-
+speech_file = "speech_only.wav"
 # Path to your audio file (mp3, wav, etc.)
-AUDIO_FILE = os.path.join(AUDIO_DIR, "Abhi Na Jaao Chhod kar ｜｜ Ananya and Ankush.mp3")
+AUDIO_FILE = os.path.join(AUDIO_DIR, "Niye Jabe Ki (নিয়ে যাবে কি)｜ Daagi ｜ Afran Nisho,Xefer,Tama,Sunerah ｜ Shihab S ｜SVF Alpha-i｜ Chorki.mp3")
 
 # Load audio with pydub
 audio = AudioSegment.from_file(AUDIO_FILE)

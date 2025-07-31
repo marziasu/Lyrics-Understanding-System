@@ -9,3 +9,5 @@ torchaudio
 silero-vad
 
 soundfile
+demucs
+librosa
