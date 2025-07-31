@@ -3,3 +3,9 @@ openai-whisper
 torch
 imageio-ffmpeg
 pydub
+
+torch 
+torchaudio 
+silero-vad
+
+soundfile
