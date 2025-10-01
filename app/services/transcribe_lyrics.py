@@ -10,7 +10,8 @@ model_size = "large-v3"  # or "base", "small", etc.
 model = WhisperModel(model_size, device="cuda" if os.environ.get("USE_CUDA") else "cpu", compute_type="int8")
 
 # Path to your audio file
-AUDIO_FILE = os.path.join("demucs_output/htdemucs/Niye Jabe Ki", "vocals.wav")
+# AUDIO_FILE = os.path.join("demucs_output/htdemucs/Niye Jabe Ki", "vocals.wav")
+AUDIO_FILE = os.path.join("sample_audio.mp3")
 
 # Load audio with pydub
 audio = AudioSegment.from_file(AUDIO_FILE)
@@ -38,3 +39,7 @@ for i in range(total_chunks):
     print(f"[{start_ms/1000:.1f}s - {end_ms/1000:.1f}s] ➤ {transcribed_text.strip()}")
 
     os.remove(chunk_path)
+
+
+# Detected Language: ar
+# [0.0s - 14.0s] ➤ قل هو الله أحد الله الصمد لم يلد ولم يولد ولم يكن له كفوا أحد
